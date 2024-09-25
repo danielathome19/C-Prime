@@ -1,0 +1,14 @@
+{
+    "files.associations": {
+        "stdbool.h": "c",
+        "string.h": "c",
+        "float.h": "c",
+        "stddef.h": "c",
+        "stdarg.h": "c",
+        "limits.h": "c",
+        "stdint.h": "c",
+        "math.h": "c",
+        "errno.h": "c",
+        "myclib.h": "c"
+    }
+}
