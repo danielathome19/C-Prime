@@ -95,6 +95,18 @@ int main() {
         printf("File not found exception in file reader\n");
     } etry;
 
+    // Test substring function with one and two arguments
+    string str = "Hello, World!";
+    string hello = substr(str, 0, 5);
+    string world = substr(str, 7);
+    printf("%s %s\n", hello, world);
+
+    int commaindex = strindex(str, ",");
+    printf("%d\n", commaindex);
+
+    int commaindex2 = strindex_char(str, ',');
+    printf("%d\n", commaindex2);
+
     printf("========== Done ==========\n");
     return 0;
 }

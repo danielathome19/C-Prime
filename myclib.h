@@ -17,6 +17,13 @@
 #include <signal.h>
 
 
+/* Macros for simulating function overloading */
+#define GET_MACRO2(_1, _2, NAME, ...) NAME
+#define GET_MACRO3(_1, _2, _3, NAME, ...) NAME
+#define GET_MACRO4(_1, _2, _3, _4, NAME, ...) NAME
+#define GET_MACRO5(_1, _2, _3, _4, _5, NAME, ...) NAME
+
+
 /* Exception handling */
 static jmp_buf ex_buf__;
 #define try do { switch( setjmp(ex_buf__) ) { case 0: while(1) {
@@ -711,10 +718,7 @@ FileWriter* new_filewriter_WA(const char* filename, bool append) {
 }
 FileWriter* new_filewriter_W(const char* filename) { return new_filewriter_WA(filename, false); }
 FileWriter* new_filewriter_A(const char* filename) { return new_filewriter_WA(filename, true); }
-
-// Macro for simulating function overloading
-#define GET_MACRO(_1, _2, NAME, ...) NAME
-#define new_filewriter(...) GET_MACRO(__VA_ARGS__, new_filewriter_WA, new_filewriter_W)(__VA_ARGS__)
+#define new_filewriter(...) GET_MACRO2(__VA_ARGS__, new_filewriter_WA, new_filewriter_W)(__VA_ARGS__)
 
 void close_filewriter(FileWriter* filewriter) {
     if (filewriter != NULL) {
@@ -727,6 +731,42 @@ void close_filewriter(FileWriter* filewriter) {
 void close_filewriter_flush(FileWriter* filewriter) {
     __filewriter_write_char(filewriter, '\n');
     close_filewriter(filewriter);
+}
+
+
+/* String functions */
+string substr_end(string str, int start, int end) {
+    if (str == NULL) return NULL;
+    int len = strlen(str);
+    if (start < 0 || start >= len || end < 0 || end > len) throw(OUT_OF_BOUNDS_EXCEPTION);
+    if (start >= end) return NULL;
+    string sub = (string) malloc(end - start + 1);
+    if (sub == NULL) return NULL;
+    strncpy(sub, str + start, end - start);
+    sub[end - start] = '\0';
+    return sub;
+}
+
+string substr_len(string str, int start) {
+    if (str == NULL) return NULL;
+    int len = strlen(str);
+    return substr_end(str, start, len);
+}
+
+#define substr(...) GET_MACRO3(__VA_ARGS__, substr_end, substr_len)(__VA_ARGS__)
+
+int strindex(string str, string substr) {
+    if (str == NULL || substr == NULL) return -1;
+    string found = strstr(str, substr);
+    if (found == NULL) return -1;
+    return found - str;
+}
+
+int strindex_char(string str, char c) {
+    if (str == NULL) return -1;
+    string found = strchr(str, c);
+    if (found == NULL) return -1;
+    return found - str;
 }
 
 
