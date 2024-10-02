@@ -77,7 +77,11 @@ int main() {
         char ch3 = FileReader_nextChar(fr2);
         printf("%c %c%c\n", ch, ch2, ch3);
         close_FileReader(fr2);
+    } catch (FILE_NOT_FOUND_EXCEPTION) {
+        printf("File not found exception in file reader\n");
+    } etry;
 
+    try {
         FileWriter *fw = new_FileWriter("test2.txt", true);
         FileWriter_writeInt(fw, 123);
         FileWriter_writeFloat(fw, 3.14);
@@ -92,7 +96,7 @@ int main() {
         FileWriter_writeChar(fw, 'c');
         close_FileWriter(fw);
     } catch (FILE_NOT_FOUND_EXCEPTION) {
-        printf("File not found exception in file reader\n");
+        printf("File not found exception in file writer\n");
     } etry;
 
     // Test substring function with one and two arguments
