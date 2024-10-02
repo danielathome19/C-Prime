@@ -1,4 +1,5 @@
 myclib.exe
 test.exe
 *.txt
+!test.txt
 /.vscode

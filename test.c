@@ -116,6 +116,40 @@ int main() {
     float f = get_float("Enter a float: ");
     printf("Integer: %d, Float: %f\n", n, f);
 
+    // Test verbal logical operators (from iso646.h)
+    bool testbool = 1 and 3;
+    while (testbool or false) {
+        printf("Test\n");
+        testbool = false;
+    }
+    
+    // Test foreach macro with implicit and explicit length
+    int arr[] = {1, 2, 3, 4, 5};
+    foreach (int, x, arr) {
+        printf("%d ", *x);  // Dereference the pointer
+    }
+    printf("\n");
+    printf("Length of arr: %d\n", arrlen(arr));
+
+    char* words = "Hello, World!";
+    foreach (char, c, words, 5) {
+        printf("%c ", *c);
+    }
+    printf("\n");
+
+    fori (i, 0, 10, 2) {
+        printf("%d ", i);
+    }
+    printf("\n");
+
+    fori (i, 1, 5) {
+        printf("%d ", i);
+    }
+    printf("\n");
+
+    fori (i, 10) printf("%d ", i);
+    printf("\n");
+
     printf("========== Done ==========\n");
     return 0;
 }

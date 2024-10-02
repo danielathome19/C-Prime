@@ -15,6 +15,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <signal.h>
+#include <iso646.h>
 
 
 /* Macros for simulating function overloading */
@@ -768,6 +769,45 @@ int strindex_char(string str, char c) {
     if (found == NULL) return -1;
     return found - str;
 }
+
+string strtoupper(string str) {
+    if (str == NULL) return NULL;
+    int len = strlen(str);
+    string upper = (string) malloc(len + 1);
+    if (upper == NULL) return NULL;
+    for (int i = 0; i < len; i++)
+        upper[i] = toupper(str[i]);
+    upper[len] = '\0';
+    return upper;
+}
+
+string strtolower(string str) {
+    if (str == NULL) return NULL;
+    int len = strlen(str);
+    string lower = (string) malloc(len + 1);
+    if (lower == NULL) return NULL;
+    for (int i = 0; i < len; i++)
+        lower[i] = tolower(str[i]);
+    lower[len] = '\0';
+    return lower;
+}
+
+
+/* For macros */
+#define arrlen(array) (sizeof(array) / sizeof(array[0]))
+#define __foreach_3(type, var, arr) \
+    for (type* var = (arr); var < (arr) + arrlen(arr); ++var)
+#define __foreach_4(type, var, arr, len) \
+    for (type* var = (arr); var < (arr) + (len); ++var)
+#define foreach(...) GET_MACRO4(__VA_ARGS__, __foreach_4, __foreach_3)(__VA_ARGS__)
+
+#define __fori_2(var, stop) \
+    for (int var = 0; var < (stop); ++var)
+#define __fori_3(var, start, stop) \
+    for (int var = (start); var < (stop); ++var)
+#define __fori_4(var, start, stop, step) \
+    for (int var = (start); ((step) > 0) ? (var < (stop)) : (var > (stop)); var += (step))
+#define fori(...) GET_MACRO4(__VA_ARGS__, __fori_4, __fori_3, __fori_2)(__VA_ARGS__)
 
 
 #pragma GCC diagnostic pop
