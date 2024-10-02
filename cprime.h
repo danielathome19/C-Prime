@@ -1,7 +1,7 @@
 /**
  * @file cprime.h
  * 
- * C' (C Prime) is a library for the C programming language that includes 
+ * C′ (C Prime) is a library for the C programming language that includes 
  * standard library headers, macros, and functions to provide a more modern and 
  * user-friendly experience for C programmers. It includes high-level (C++-like) features:
  *  - exception/signal handling, try-catch-finally blocks
