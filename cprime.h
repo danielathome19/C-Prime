@@ -1,12 +1,24 @@
 /**
  * @file cprime.h
  * 
- * TBD
+ * C' (C Prime) is a library for the C programming language that includes 
+ * standard library headers, macros, and functions to provide a more modern and 
+ * user-friendly experience for C programmers. It includes high-level (C++-like) features:
+ *  - exception/signal handling, try-catch-finally blocks
+ *  - function overloading (using macros)
+ *  - boolean, string, and auto types
+ *  - simplified input functions (with prompts)
+ *  - string functions (substring, index, toupper/tolower, etc.)
+ *  - foreach, fori, and arrlen macros
+ *  - File Reader and File Writer classes
+ *  - etc.
+ * 
+ * This header file is intended to be a drop-in replacement for the standard C library
+ * and is designed to be used in conjunction with the standard C library headers.
  * 
  * @author Daniel J. Szelogowski
  * @date September 2024
  * @license: TBD
- * 
  */
 #ifndef _CPRIME_H_
 #define _CPRIME_H_
@@ -33,6 +45,8 @@
 #define GET_MACRO3(_1, _2, _3, NAME, ...) NAME
 #define GET_MACRO4(_1, _2, _3, _4, NAME, ...) NAME
 #define GET_MACRO5(_1, _2, _3, _4, _5, NAME, ...) NAME
+
+
 
 
 /* Exception handling */
@@ -81,43 +95,30 @@ static jmp_buf ex_buf__;
 #define NOT_FOUND_EXCEPTION (35)
 
 
+
+
 /* Exception signals */
-// Throw floating-point exception for sigfpe (floating-point exception signal)
-static void __handle_sigfpe(int sig) { if (sig == SIGFPE) throw(FLOATING_POINT_EXCEPTION); }
-
-// Throw null pointer exception (segmentation fault)
+static void __handle_sigfpe(int sig)  { if (sig == SIGFPE)  throw(FLOATING_POINT_EXCEPTION); }
 static void __handle_sigsegv(int sig) { if (sig == SIGSEGV) throw(NULL_POINTER_EXCEPTION); }
-
-// Throw memory allocation failure exception for sigabrt (abort signal)
 static void __handle_sigabrt(int sig) { if (sig == SIGABRT) throw(MEMORY_ALLOCATION_EXCEPTION); }
-
-// Throw illegal argument exception for sigill (illegal instruction signal)
-static void __handle_sigill(int sig) { if (sig == SIGILL) throw(ILLEGAL_ARGUMENT_EXCEPTION); }
-
-// Throw timeout exception for sigterm (termination signal)
+static void __handle_sigill(int sig)  { if (sig == SIGILL)  throw(ILLEGAL_ARGUMENT_EXCEPTION); }
 static void __handle_sigterm(int sig) { if (sig == SIGTERM) throw(TIMEOUT_EXCEPTION); }
-
-// Throw timeout exception for sigint (interrupt signal)
-static void __handle_sigint(int sig) { if (sig == SIGINT) throw(TIMEOUT_EXCEPTION); }
+static void __handle_sigint(int sig)  { if (sig == SIGINT)  throw(TIMEOUT_EXCEPTION); }
 
 #ifdef __unix__  // Or __APPLE__ for macOS, __linux__ for Linux
     #ifdef SIGBUS
-        // Throw hangup exception for sighup (hangup signal)
-        static void __handle_sigbus(int sig) { if (sig == SIGBUS) throw(BUS_ERROR_EXCEPTION); }
+        static void __handle_sigbus(int sig)  { if (sig == SIGBUS)  throw(BUS_ERROR_EXCEPTION); }
     #endif 
 
     #ifdef SIGPIPE
-        // Throw pipe error exception for sigpipe (broken pipe signal)
         static void __handle_sigpipe(int sig) { if (sig == SIGPIPE) throw(PIPE_ERROR_EXCEPTION); }
     #endif
 
     #ifdef SIGHUP
-        // Throw hangup exception for sighup (hangup signal)
-        static void __handle_sighup(int sig) { if (sig == SIGHUP) throw(HANGUP_EXCEPTION); }
+        static void __handle_sighup(int sig)  { if (sig == SIGHUP)  throw(HANGUP_EXCEPTION); }
     #endif
 
     #ifdef SIGQUIT
-        // Throw quit exception for sigquit (quit signal)
         static void __handle_sigquit(int sig) { if (sig == SIGQUIT) throw(QUIT_EXCEPTION); }
     #endif
 #endif  // __unix__
@@ -148,6 +149,8 @@ static void __setup_signal_handlers(void) {
 }
 
 
+
+
 /* Boolean definitions */
 #if (__STDC_VERSION__ >= 199901L && __STDC_VERSION__ < 202000L)
     #include <stdbool.h>
@@ -167,11 +170,16 @@ static void __setup_signal_handlers(void) {
 #endif
 
 
+
+
 /* Type definitions */
+
 typedef char* string;
 typedef char byte;
 typedef char* bytes;
 typedef void* any;
+
+
 
 
 /* Input functions */
@@ -183,7 +191,6 @@ long long get_long_long(const char* format, ...) __attribute__((format(printf, 1
 char get_char(const char* format, ...) __attribute__((format(printf, 1, 2)));
 string get_string(va_list* args, const char* format, ...) __attribute__((format(printf, 2, 3)));
 #define get_string(...) get_string(NULL, __VA_ARGS__)
-
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wformat-security"
@@ -433,6 +440,7 @@ static void __teardown(void) {
     #error Some compiler-specific features missing.
 #endif
 
+/* Setup signal handlers and buffer for stdout */
 INITIALIZER(setup) {
     setvbuf(stdout, NULL, _IONBF, 0);
     __setup_signal_handlers();
@@ -440,23 +448,54 @@ INITIALIZER(setup) {
 }
 
 
+
+
 /* File Reader */
+
+/**
+ * @brief File reader structure; reads from a file line-by-line or word-by-word
+ * @note You must call `close_FileReader(FileReader*)` to free the memory after use
+ * @param file The file to read from
+ * @throw `FILE_NOT_FOUND_EXCEPTION` if the file is not found
+ * @throw `MEMORY_ALLOCATION_EXCEPTION` if memory allocation fails
+ * @throw `ILLEGAL_ARGUMENT_EXCEPTION` if the filename is NULL
+ * 
+ * ### Methods
+ * 
+ * - `new_FileReader(string filename)`
+ * 
+ * - `close_FileReader(FileReader*)`
+ * 
+ * - `FileReader_nextLine(FileReader*)`
+ * 
+ * - `FileReader_nextString(FileReader*)`
+ * 
+ * - `FileReader_nextChar(FileReader*)`
+ * 
+ * - `FileReader_nextInt(FileReader*)`
+ * 
+ * - `FileReader_nextLong(FileReader*)`
+ * 
+ * - `FileReader_nextFloat(FileReader*)`
+ * 
+ * - `FileReader_nextDouble(FileReader*)`
+ * 
+ * - `FileReader_hasNext(FileReader*)`
+ */
 typedef struct FileReader FileReader;
 struct FileReader {
     FILE* file;
     string buffer;
     size_t capacity;
     size_t size;
-    // string (*nextLine)(FileReader*);
-    // string (*nextString)(FileReader*);
-    // char (*nextChar)(FileReader*);
-    // int (*nextInt)(FileReader*);
-    // long (*nextLong)(FileReader*);
-    // float (*nextFloat)(FileReader*);
-    // double (*nextDouble)(FileReader*);
-    // bool (*hasNext)(FileReader*);
 };
 
+/**
+ * @brief Read the next line from the file (up to the next newline or EOF)
+ * @param filereader The file reader to read from
+ * @return The line read from the file, or NULL if not found
+ * @memberof FileReader
+ */
 string FileReader_nextLine(FileReader* filereader) {
     if (filereader == NULL || filereader->file == NULL)
         return NULL;
@@ -488,6 +527,12 @@ string FileReader_nextLine(FileReader* filereader) {
     return s;
 }
 
+/**
+ * @brief Read the next string from the file (up to the next space, newline, or EOF)
+ * @param filereader The file reader to read from
+ * @return The string read from the file, or NULL if not found
+ * @memberof FileReader
+ */
 string FileReader_nextString(FileReader* filereader) {
     if (filereader == NULL || filereader->file == NULL)
         return NULL;
@@ -527,6 +572,12 @@ string FileReader_nextString(FileReader* filereader) {
     return filereader->buffer;
 }
 
+/**
+ * @brief Read the next character from the file (skipping whitespace)
+ * @param filereader The file reader to read from
+ * @return The character read from the file, or CHAR_MAX if not found
+ * @memberof FileReader
+ */
 char FileReader_nextChar(FileReader* filereader) {
     if (filereader == NULL || filereader->file == NULL)
         return CHAR_MAX;
@@ -538,6 +589,12 @@ char FileReader_nextChar(FileReader* filereader) {
     return (char)c;
 }
 
+/**
+ * @brief Read an integer from the file (up to the next space, newline, or EOF)
+ * @param filereader The file reader to read from
+ * @return The integer read from the file, or INT_MAX if not found
+ * @memberof FileReader
+ */
 int FileReader_nextInt(FileReader* filereader) {
     if (filereader == NULL || filereader->file == NULL)
         return INT_MAX;
@@ -554,6 +611,12 @@ int FileReader_nextInt(FileReader* filereader) {
     return INT_MAX;
 }
 
+/**
+ * @brief Read a long from the file (up to the next space, newline, or EOF)
+ * @param filereader The file reader to read from
+ * @return The long read from the file, or LONG_MAX if not found
+ * @memberof FileReader
+ */
 long FileReader_nextLong(FileReader* filereader) {
     if (filereader == NULL || filereader->file == NULL)
         return LONG_MAX;
@@ -570,6 +633,12 @@ long FileReader_nextLong(FileReader* filereader) {
     return LONG_MAX;
 }
 
+/**
+ * @brief Read a float from the file (up to the next space, newline, or EOF)
+ * @param filereader The file reader to read from
+ * @return The float read from the file, or FLT_MAX if not found
+ * @memberof FileReader
+ */
 float FileReader_nextFloat(FileReader* filereader) {
     if (filereader == NULL || filereader->file == NULL)
         return FLT_MAX;
@@ -586,6 +655,12 @@ float FileReader_nextFloat(FileReader* filereader) {
     return FLT_MAX;
 }
 
+/**
+ * @brief Read a double from the file (up to the next space, newline, or EOF)
+ * @param filereader The file reader to read from
+ * @return The double read from the file, or DBL_MAX if not found
+ * @memberof FileReader
+ */
 double FileReader_nextDouble(FileReader* filereader) {
     if (filereader == NULL || filereader->file == NULL)
         return DBL_MAX;
@@ -602,6 +677,12 @@ double FileReader_nextDouble(FileReader* filereader) {
     return DBL_MAX;
 }
 
+/**
+ * @brief Check if the file reader has more data to read
+ * @param filereader The file reader to check
+ * @return True if there is more data to read, or false otherwise
+ * @memberof FileReader
+ */
 bool FileReader_hasNext(FileReader* filereader) {
     if (filereader == NULL || filereader->file == NULL)
         return false;
@@ -611,6 +692,15 @@ bool FileReader_hasNext(FileReader* filereader) {
     return c != EOF;
 }
 
+/**
+ * @brief Create a new file reader
+ * @param filename The name of the file to read
+ * @return The file reader
+ * @throw `FILE_NOT_FOUND_EXCEPTION` if the file is not found
+ * @throw `MEMORY_ALLOCATION_EXCEPTION` if memory allocation fails
+ * @throw `ILLEGAL_ARGUMENT_EXCEPTION` if the filename is NULL
+ * @memberof FileReader
+ */
 FileReader* new_FileReader(const char* filename) {
     if (filename == NULL) {
         throw(ILLEGAL_ARGUMENT_EXCEPTION);
@@ -631,17 +721,14 @@ FileReader* new_FileReader(const char* filename) {
     filereader->buffer = NULL;
     filereader->capacity = 0;
     filereader->size = 0;
-    // filereader->nextLine = FileReader_nextLine;
-    // filereader->nextString = FileReader_nextString;
-    // filereader->nextChar = FileReader_nextChar;
-    // filereader->nextInt = FileReader_nextInt;
-    // filereader->nextLong = FileReader_nextLong;
-    // filereader->nextFloat = FileReader_nextFloat;
-    // filereader->nextDouble = FileReader_nextDouble;
-    // filereader->hasNext = FileReader_hasNext;
     return filereader;
 }
 
+/**
+ * @brief Close the file reader and free allocated memory
+ * @param filereader The file reader to close
+ * @memberof FileReader
+ */
 void close_FileReader(FileReader* filereader) {
     if (filereader != NULL) {
         if (filereader->file != NULL)
@@ -653,55 +740,47 @@ void close_FileReader(FileReader* filereader) {
 }
 
 
+
+
 /* File Writer */
+
 /**
  * @brief File writer structure; writes to a file using various data types.
- * 
- * @note Instantiate using new_FileWriter(filename, appendMode=false)
- * @note Close using close_FileWriter(filewriter, flush=true) where `flush` is a line break
- * 
+ * @note You must call `close_FileWriter(FileWriter*, bool flush=true)` to free the memory after use
  * @param file The file to write to
- * 
- * @throw FILE_NOT_FOUND_EXCEPTION if the file is not found
- * @throw MEMORY_ALLOCATION_EXCEPTION if memory allocation fails
- * @throw ILLEGAL_ARGUMENT_EXCEPTION if the filename is NULL
+ * @throw `FILE_NOT_FOUND_EXCEPTION` if the file is not found
+ * @throw `MEMORY_ALLOCATION_EXCEPTION` if memory allocation fails
+ * @throw `ILLEGAL_ARGUMENT_EXCEPTION` if the filename is NULL
  * 
  * ### Methods
  * 
- * - writeLine(FileWriter*, const char*)
+ * - `new_FileWriter(string filename, bool appendMode=false)` 
  * 
- * - writeString(FileWriter*, const char*)
+ * - `close_FileWriter(FileWriter*, bool flush=true)` where `flush` adds a line break before closing
  * 
- * - writeChar(FileWriter*, char)
+ * - `FileWriter_writeLine(FileWriter*, const char*)`
  * 
- * - writeInt(FileWriter*, int)
+ * - `FileWriter_writeString(FileWriter*, const char*)`
  * 
- * - writeLong(FileWriter*, long)
+ * - `FileWriter_writeChar(FileWriter*, char)`
  * 
- * - writeFloat(FileWriter*, float)
+ * - `FileWriter_writeInt(FileWriter*, int)`
  * 
- * - writeDouble(FileWriter*, double)
+ * - `FileWriter_writeLong(FileWriter*, long)`
+ * 
+ * - `FileWriter_writeFloat(FileWriter*, float)`
+ * 
+ * - `FileWriter_writeDouble(FileWriter*, double)`
  */
 typedef struct FileWriter FileWriter;
 struct FileWriter {
     FILE* file;
-    // void (*writeLine)(FileWriter*, const char*);
-    // void (*writeString)(FileWriter*, const char*);
-    // void (*writeChar)(FileWriter*, char);
-    // void (*writeInt)(FileWriter*, int);
-    // void (*writeLong)(FileWriter*, long);
-    // void (*writeFloat)(FileWriter*, float);
-    // void (*writeDouble)(FileWriter*, double);
 };
 
 /**
- * @brief Write a line to the file
- * 
+ * @brief Write a line to the file and append a line break
  * @param filewriter The file writer to write to
- * @param line The line to write (with a line break)
- * 
- * @throw ILLEGAL_ARGUMENT_EXCEPTION if the file writer or line is NULL
- * 
+ * @param line The string to write
  * @memberof FileWriter
  */
 void FileWriter_writeLine(FileWriter* filewriter, const char* line) {
@@ -709,31 +788,67 @@ void FileWriter_writeLine(FileWriter* filewriter, const char* line) {
     fprintf(filewriter->file, "%s\n", line);
 }
 
+/**
+ * @brief Write a string to the file
+ * @param filewriter The file writer to write to
+ * @param s The string to write
+ * @memberof FileWriter
+ */
 void FileWriter_writeString(FileWriter* filewriter, const char* s) {
     if (filewriter == NULL || filewriter->file == NULL || s == NULL) return;
     fprintf(filewriter->file, "%s", s);
 }
 
+/**
+ * @brief Write a character to the file
+ * @param filewriter The file writer to write to
+ * @param c The character to write
+ * @memberof FileWriter
+ */
 void FileWriter_writeChar(FileWriter* filewriter, char c) {
     if (filewriter == NULL || filewriter->file == NULL) return;
     fprintf(filewriter->file, "%c", c);
 }
 
+/**
+ * @brief Write an integer to the file
+ * @param filewriter The file writer to write to
+ * @param n The integer to write
+ * @memberof FileWriter
+ */
 void FileWriter_writeInt(FileWriter* filewriter, int n) {
     if (filewriter == NULL || filewriter->file == NULL) return;
     fprintf(filewriter->file, "%d", n);
 }
 
+/**
+ * @brief Write a long integer to the file
+ * @param filewriter The file writer to write to
+ * @param n The long integer to write
+ * @memberof FileWriter
+ */
 void FileWriter_writeLong(FileWriter* filewriter, long n) {
     if (filewriter == NULL || filewriter->file == NULL) return;
     fprintf(filewriter->file, "%ld", n);
 }
 
+/**
+ * @brief Write a float to the file
+ * @param filewriter The file writer to write to
+ * @param f The float to write
+ * @memberof FileWriter
+ */
 void FileWriter_writeFloat(FileWriter* filewriter, float f) {
     if (filewriter == NULL || filewriter->file == NULL) return;
     fprintf(filewriter->file, "%f", f);
 }
 
+/**
+ * @brief Write a double to the file
+ * @param filewriter The file writer to write to
+ * @param d The double to write
+ * @memberof FileWriter
+ */
 void FileWriter_writeDouble(FileWriter* filewriter, double d) {
     if (filewriter == NULL || filewriter->file == NULL) return;
     fprintf(filewriter->file, "%lf", d);
@@ -756,18 +871,22 @@ FileWriter* __new_FileWriter_WA(const char* filename, bool append) {
         return NULL;
     }
     filewriter->file = file;
-    // filewriter->writeLine = FileWriter_writeLine;
-    // filewriter->writeString = FileWriter_writeString;
-    // filewriter->writeChar = FileWriter_writeChar;
-    // filewriter->writeInt = FileWriter_writeInt;
-    // filewriter->writeLong = FileWriter_writeLong;
-    // filewriter->writeFloat = FileWriter_writeFloat;
-    // filewriter->writeDouble = FileWriter_writeDouble;
     return filewriter;
 }
-FileWriter* new_FileWriter_W(const char* filename) { return __new_FileWriter_WA(filename, false); }
-FileWriter* new_FileWriter_A(const char* filename) { return __new_FileWriter_WA(filename, true); }
-#define new_FileWriter(...) GET_MACRO2(__VA_ARGS__, __new_FileWriter_WA, new_FileWriter_W)(__VA_ARGS__)
+FileWriter* __new_FileWriter_W(const char* filename) { return __new_FileWriter_WA(filename, false); }
+FileWriter* __new_FileWriter_A(const char* filename) { return __new_FileWriter_WA(filename, true); }
+
+/**
+ * @brief Create a new file writer
+ * @param filename The name of the file to write to
+ * @param append [optional] Whether to append open the file in append mode (default is false)
+ * @return The file writer
+ * @throw `FILE_NOT_FOUND_EXCEPTION` if the file is not found
+ * @throw `MEMORY_ALLOCATION_EXCEPTION` if memory allocation fails
+ * @throw `ILLEGAL_ARGUMENT_EXCEPTION` if the filename is NULL
+ * @memberof FileWriter
+ */
+#define new_FileWriter(...) GET_MACRO2(__VA_ARGS__, __new_FileWriter_WA, __new_FileWriter_W)(__VA_ARGS__)
 
 void __close_FileWriter(FileWriter* filewriter, bool flush) {
     if (flush) FileWriter_writeChar(filewriter, '\n');
@@ -777,21 +896,29 @@ void __close_FileWriter(FileWriter* filewriter, bool flush) {
         free(filewriter);
     }
 }
-void close_FileWriter_flush(FileWriter* filewriter)   { __close_FileWriter(filewriter, true); }
-void close_FileWriter_noflush(FileWriter* filewriter) { __close_FileWriter(filewriter, false); }
-#define close_FileWriter(...) GET_MACRO2(__VA_ARGS__, __close_FileWriter, close_FileWriter_flush)(__VA_ARGS__)
+void __close_FileWriter_flush(FileWriter* filewriter)   { __close_FileWriter(filewriter, true); }
+void __close_FileWriter_noflush(FileWriter* filewriter) { __close_FileWriter(filewriter, false); }
+
+/**
+ * @brief Close a file writer
+ * @param filewriter The file writer to close
+ * @param flush [optional] Whether to flush the file (appends a line break; default is true)
+ * @memberof FileWriter
+ */
+#define close_FileWriter(...) GET_MACRO2(__VA_ARGS__, __close_FileWriter, __close_FileWriter_flush)(__VA_ARGS__)
+
+
 
 
 /* String functions */
+
 /**
  * @brief Get a substring of a string from the starting index to the ending index
- * 
  * @param str The string to get the substring from
  * @param start The starting index of the substring
  * @param end The ending index of the substring
- * 
- * @return The substring of the string
- * @throw OUT_OF_BOUNDS_EXCEPTION if the starting index is out of bounds
+ * @return The substring of the string or NULL
+ * @throw `OUT_OF_BOUNDS_EXCEPTION` if the starting index is out of bounds
  */
 string substr_end(string str, int start, int end) {
     if (str == NULL) return NULL;
@@ -807,12 +934,10 @@ string substr_end(string str, int start, int end) {
 
 /**
  * @brief Get a substring of a string from the starting index to the end of the string
- * 
  * @param str The string to get the substring from
  * @param start The starting index of the substring
- * 
- * @return The substring of the string
- * @throw OUT_OF_BOUNDS_EXCEPTION if the starting index is out of bounds
+ * @return The substring of the string or NULL
+ * @throw `OUT_OF_BOUNDS_EXCEPTION` if the starting index is out of bounds
  */
 string substr_len(string str, int start) {
     if (str == NULL) return NULL;
@@ -822,21 +947,17 @@ string substr_len(string str, int start) {
 
 /**
  * @brief Get a substring of a string
- * 
  * @param str The string to get the substring from
  * @param start The starting index of the substring
- * @param end The ending index of the substring (optional; default is end of string)
- * 
- * @return The substring of the string
+ * @param end [optional] The ending index of the substring (default is end of string)
+ * @return The substring of the string or NULL
  */
 #define substr(...) GET_MACRO3(__VA_ARGS__, substr_end, substr_len)(__VA_ARGS__)
 
 /**
  * @brief Find the index of a substring in a string
- * 
  * @param str The string to search
  * @param substr The substring to find
- * 
  * @return The index of the substring in the string, or -1 if not found
  */
 int strindex(string str, string substr) {
@@ -848,10 +969,8 @@ int strindex(string str, string substr) {
 
 /**
  * @brief Find the index of a character in a string
- * 
  * @param str The string to search
  * @param c The character to find
- * 
  * @return The index of the character in the string, or -1 if not found
  */
 int strindex_char(string str, char c) {
@@ -863,9 +982,7 @@ int strindex_char(string str, char c) {
 
 /**
  * @brief Convert a string to uppercase
- * 
  * @param str The string to convert to uppercase
- * 
  * @return The uppercase string
  */
 string strtoupper(string str) {
@@ -881,10 +998,8 @@ string strtoupper(string str) {
 
 /**
  * @brief Convert a string to lowercase
- * 
  * @param str The string to convert to lowercase
- * 
- * @return The lowercase string
+ * @return The lowercase string or NULL
  */
 string strtolower(string str) {
     if (str == NULL) return NULL;
@@ -898,7 +1013,11 @@ string strtolower(string str) {
 }
 
 
+
+
 /* For macros */
+
+/* @return The number of items in an array (does not work for array pointers) */
 #define arrlen(array) (sizeof(array) / sizeof(array[0]))
 #define __foreach_3(type, var, arr) \
     for (type* var = (arr); var < (arr) + arrlen(arr); ++var)
@@ -907,7 +1026,6 @@ string strtolower(string str) {
 
 /**
  * @brief Foreach loop macro with implicit or explicit length
- * 
  * @param ... Arguments for the foreach loop (type, variable, array, length [optional; required for manually allocated arrays])
  */
 #define foreach(...) GET_MACRO4(__VA_ARGS__, __foreach_4, __foreach_3)(__VA_ARGS__)
@@ -921,7 +1039,6 @@ string strtolower(string str) {
 
 /**
  * @brief For loop macro with implicit or explicit start, stop, and step
- * 
  * @param ... Arguments for the for loop (loop variable, start=0, stop, step=1)
  *
  * @code 
