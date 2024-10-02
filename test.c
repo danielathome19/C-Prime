@@ -45,52 +45,52 @@ int main() {
     } etry;
 
     try {
-        FileReader *fileReader = new_filereader("test.txt");
+        FileReader *fr = new_FileReader("test.txt");
         printf("File opened successfully\n");
-        while (fileReader->has_next(fileReader))
-            printf("%s\n", fileReader->next_line(fileReader));
-        close_filereader(fileReader);
+        while (FileReader_hasNext(fr))
+            printf("%s\n", FileReader_nextLine(fr));
+        close_FileReader(fr);
         printf("Finished first read\n");
 
-        FileReader *fileReader2 = new_filereader("test.txt");
-        string first = fileReader2->next_line(fileReader2);
-        int second = fileReader2->next_int(fileReader2);
-        float third = fileReader2->next_float(fileReader2);
+        FileReader *fr2 = new_FileReader("test.txt");
+        string first = FileReader_nextLine(fr2);
+        int second   = FileReader_nextInt(fr2);
+        float third  = FileReader_nextFloat(fr2);
         printf("%s %d %f\n", first, second, third);
 
-        string a = fileReader2->next_string(fileReader2);
-        string b = fileReader2->next_string(fileReader2);
-        string c = fileReader2->next_string(fileReader2);
-        string d = fileReader2->next_string(fileReader2);
-        string ef = fileReader2->next_line(fileReader2);
+        string a  = FileReader_nextString(fr2);
+        string b  = FileReader_nextString(fr2);
+        string c  = FileReader_nextString(fr2);
+        string d  = FileReader_nextString(fr2);
+        string ef = FileReader_nextLine(fr2);
         printf("%s %s %s %s\n", a, b, c, d);
         printf("%s\n", ef);
 
-        long l = fileReader2->next_long(fileReader2);
+        long l = FileReader_nextLong(fr2);
         printf("%ld\n", l);
 
-        double db = fileReader2->next_double(fileReader2);
+        double db = FileReader_nextDouble(fr2);
         printf("%lf\n", db);
 
-        char ch = fileReader2->next_char(fileReader2);
-        char ch2 = fileReader2->next_char(fileReader2);
-        char ch3 = fileReader2->next_char(fileReader2);
+        char ch  = FileReader_nextChar(fr2);
+        char ch2 = FileReader_nextChar(fr2);
+        char ch3 = FileReader_nextChar(fr2);
         printf("%c %c%c\n", ch, ch2, ch3);
-        close_filereader(fileReader2);
+        close_FileReader(fr2);
 
-        FileWriter *fileWriter = new_filewriter("test2.txt", true);
-        fileWriter->write_int(fileWriter, 123);
-        fileWriter->write_float(fileWriter, 3.14);
-        fileWriter->write_string(fileWriter, "Hello");
-        fileWriter->write_string(fileWriter, "World");
-        fileWriter->write_string(fileWriter, "!");
-        fileWriter->write_line(fileWriter, "Hello, World!");
-        fileWriter->write_long(fileWriter, 1234567890);
-        fileWriter->write_double(fileWriter, 3.14159265359);
-        fileWriter->write_char(fileWriter, 'a');
-        fileWriter->write_char(fileWriter, 'b');
-        fileWriter->write_char(fileWriter, 'c');
-        close_filewriter_flush(fileWriter);
+        FileWriter *fw = new_FileWriter("test2.txt", true);
+        FileWriter_writeInt(fw, 123);
+        FileWriter_writeFloat(fw, 3.14);
+        FileWriter_writeString(fw, "Hello");
+        FileWriter_writeString(fw, "World");
+        FileWriter_writeString(fw, "!");
+        FileWriter_writeLine(fw, "Hello, World!");
+        FileWriter_writeLong(fw, 1234567890);
+        FileWriter_writeDouble(fw, 3.14159265359);
+        FileWriter_writeChar(fw, 'a');
+        FileWriter_writeChar(fw, 'b');
+        FileWriter_writeChar(fw, 'c');
+        close_FileWriter(fw);
     } catch (FILE_NOT_FOUND_EXCEPTION) {
         printf("File not found exception in file reader\n");
     } etry;
@@ -106,6 +106,11 @@ int main() {
 
     int commaindex2 = strindex_char(str, ',');
     printf("%d\n", commaindex2);
+
+    // Test user input and type casting
+    int n = get_int("Enter an integer: ");
+    float f = get_float("Enter a float: ");
+    printf("Integer: %d, Float: %f\n", n, f);
 
     printf("========== Done ==========\n");
     return 0;

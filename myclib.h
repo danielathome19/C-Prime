@@ -429,24 +429,24 @@ INITIALIZER(setup) {
 }
 
 
-/* File Scanner */
+/* File Reader */
 typedef struct FileReader FileReader;
 struct FileReader {
     FILE* file;
     string buffer;
     size_t capacity;
     size_t size;
-    string (*next_line)(FileReader*);
-    string (*next_string)(FileReader*);
-    char (*next_char)(FileReader*);
-    int (*next_int)(FileReader*);
-    long (*next_long)(FileReader*);
-    float (*next_float)(FileReader*);
-    double (*next_double)(FileReader*);
-    bool (*has_next)(FileReader*);
+    // string (*nextLine)(FileReader*);
+    // string (*nextString)(FileReader*);
+    // char (*nextChar)(FileReader*);
+    // int (*nextInt)(FileReader*);
+    // long (*nextLong)(FileReader*);
+    // float (*nextFloat)(FileReader*);
+    // double (*nextDouble)(FileReader*);
+    // bool (*hasNext)(FileReader*);
 };
 
-string __filereader_next_line(FileReader* filereader) {
+string FileReader_nextLine(FileReader* filereader) {
     if (filereader == NULL || filereader->file == NULL)
         return NULL;
     if (filereader->buffer != NULL) {
@@ -477,7 +477,7 @@ string __filereader_next_line(FileReader* filereader) {
     return s;
 }
 
-string __filereader_next_string(FileReader* filereader) {
+string FileReader_nextString(FileReader* filereader) {
     if (filereader == NULL || filereader->file == NULL)
         return NULL;
     if (filereader->buffer != NULL) {
@@ -516,7 +516,7 @@ string __filereader_next_string(FileReader* filereader) {
     return filereader->buffer;
 }
 
-char __filereader_next_char(FileReader* filereader) {
+char FileReader_nextChar(FileReader* filereader) {
     if (filereader == NULL || filereader->file == NULL)
         return CHAR_MAX;
     int c;
@@ -527,10 +527,10 @@ char __filereader_next_char(FileReader* filereader) {
     return (char)c;
 }
 
-int __filereader_next_int(FileReader* filereader) {
+int FileReader_nextInt(FileReader* filereader) {
     if (filereader == NULL || filereader->file == NULL)
         return INT_MAX;
-    string line = __filereader_next_string(filereader);
+    string line = FileReader_nextString(filereader);
     if (line == NULL)
         return INT_MAX;
     if (strlen(line) > 0 && !isspace((unsigned char) line[0])) {
@@ -543,10 +543,10 @@ int __filereader_next_int(FileReader* filereader) {
     return INT_MAX;
 }
 
-long __filereader_next_long(FileReader* filereader) {
+long FileReader_nextLong(FileReader* filereader) {
     if (filereader == NULL || filereader->file == NULL)
         return LONG_MAX;
-    string line = __filereader_next_string(filereader);
+    string line = FileReader_nextString(filereader);
     if (line == NULL)
         return LONG_MAX;
     if (strlen(line) > 0 && !isspace((unsigned char) line[0])) {
@@ -559,10 +559,10 @@ long __filereader_next_long(FileReader* filereader) {
     return LONG_MAX;
 }
 
-float __filereader_next_float(FileReader* filereader) {
+float FileReader_nextFloat(FileReader* filereader) {
     if (filereader == NULL || filereader->file == NULL)
         return FLT_MAX;
-    string line = __filereader_next_string(filereader);
+    string line = FileReader_nextString(filereader);
     if (line == NULL)
         return FLT_MAX;
     if (strlen(line) > 0 && !isspace((unsigned char) line[0])) {
@@ -575,10 +575,10 @@ float __filereader_next_float(FileReader* filereader) {
     return FLT_MAX;
 }
 
-double __filereader_next_double(FileReader* filereader) {
+double FileReader_nextDouble(FileReader* filereader) {
     if (filereader == NULL || filereader->file == NULL)
         return DBL_MAX;
-    string line = __filereader_next_string(filereader);
+    string line = FileReader_nextString(filereader);
     if (line == NULL)
         return DBL_MAX;
     if (strlen(line) > 0 && !isspace((unsigned char) line[0])) {
@@ -591,7 +591,7 @@ double __filereader_next_double(FileReader* filereader) {
     return DBL_MAX;
 }
 
-bool __filereader_has_next(FileReader* filereader) {
+bool FileReader_hasNext(FileReader* filereader) {
     if (filereader == NULL || filereader->file == NULL)
         return false;
     int c = fgetc(filereader->file);
@@ -600,7 +600,7 @@ bool __filereader_has_next(FileReader* filereader) {
     return c != EOF;
 }
 
-FileReader* new_filereader(const char* filename) {
+FileReader* new_FileReader(const char* filename) {
     if (filename == NULL) {
         throw(ILLEGAL_ARGUMENT_EXCEPTION);
         return NULL;
@@ -620,18 +620,18 @@ FileReader* new_filereader(const char* filename) {
     filereader->buffer = NULL;
     filereader->capacity = 0;
     filereader->size = 0;
-    filereader->next_line = __filereader_next_line;
-    filereader->next_string = __filereader_next_string;
-    filereader->next_char = __filereader_next_char;
-    filereader->next_int = __filereader_next_int;
-    filereader->next_long = __filereader_next_long;
-    filereader->next_float = __filereader_next_float;
-    filereader->next_double = __filereader_next_double;
-    filereader->has_next = __filereader_has_next;
+    // filereader->nextLine = FileReader_nextLine;
+    // filereader->nextString = FileReader_nextString;
+    // filereader->nextChar = FileReader_nextChar;
+    // filereader->nextInt = FileReader_nextInt;
+    // filereader->nextLong = FileReader_nextLong;
+    // filereader->nextFloat = FileReader_nextFloat;
+    // filereader->nextDouble = FileReader_nextDouble;
+    // filereader->hasNext = FileReader_hasNext;
     return filereader;
 }
 
-void close_filereader(FileReader* filereader) {
+void close_FileReader(FileReader* filereader) {
     if (filereader != NULL) {
         if (filereader->file != NULL)
             fclose(filereader->file);
@@ -646,51 +646,51 @@ void close_filereader(FileReader* filereader) {
 typedef struct FileWriter FileWriter;
 struct FileWriter {
     FILE* file;
-    void (*write_line)(FileWriter*, const char*);
-    void (*write_string)(FileWriter*, const char*);
-    void (*write_char)(FileWriter*, char);
-    void (*write_int)(FileWriter*, int);
-    void (*write_long)(FileWriter*, long);
-    void (*write_float)(FileWriter*, float);
-    void (*write_double)(FileWriter*, double);
+    // void (*writeLine)(FileWriter*, const char*);
+    // void (*writeString)(FileWriter*, const char*);
+    // void (*writeChar)(FileWriter*, char);
+    // void (*writeInt)(FileWriter*, int);
+    // void (*writeLong)(FileWriter*, long);
+    // void (*writeFloat)(FileWriter*, float);
+    // void (*writeDouble)(FileWriter*, double);
 };
 
-void __filewriter_write_line(FileWriter* filewriter, const char* line) {
+void FileWriter_writeLine(FileWriter* filewriter, const char* line) {
     if (filewriter == NULL || filewriter->file == NULL || line == NULL) return;
     fprintf(filewriter->file, "%s\n", line);
 }
 
-void __filewriter_write_string(FileWriter* filewriter, const char* s) {
+void FileWriter_writeString(FileWriter* filewriter, const char* s) {
     if (filewriter == NULL || filewriter->file == NULL || s == NULL) return;
     fprintf(filewriter->file, "%s", s);
 }
 
-void __filewriter_write_char(FileWriter* filewriter, char c) {
+void FileWriter_writeChar(FileWriter* filewriter, char c) {
     if (filewriter == NULL || filewriter->file == NULL) return;
     fprintf(filewriter->file, "%c", c);
 }
 
-void __filewriter_write_int(FileWriter* filewriter, int n) {
+void FileWriter_writeInt(FileWriter* filewriter, int n) {
     if (filewriter == NULL || filewriter->file == NULL) return;
     fprintf(filewriter->file, "%d", n);
 }
 
-void __filewriter_write_long(FileWriter* filewriter, long n) {
+void FileWriter_writeLong(FileWriter* filewriter, long n) {
     if (filewriter == NULL || filewriter->file == NULL) return;
     fprintf(filewriter->file, "%ld", n);
 }
 
-void __filewriter_write_float(FileWriter* filewriter, float f) {
+void FileWriter_writeFloat(FileWriter* filewriter, float f) {
     if (filewriter == NULL || filewriter->file == NULL) return;
     fprintf(filewriter->file, "%f", f);
 }
 
-void __filewriter_write_double(FileWriter* filewriter, double d) {
+void FileWriter_writeDouble(FileWriter* filewriter, double d) {
     if (filewriter == NULL || filewriter->file == NULL) return;
     fprintf(filewriter->file, "%lf", d);
 }
 
-FileWriter* new_filewriter_WA(const char* filename, bool append) {
+FileWriter* __new_FileWriter_WA(const char* filename, bool append) {
     if (filename == NULL) {
         throw(ILLEGAL_ARGUMENT_EXCEPTION);
         return NULL;
@@ -707,31 +707,31 @@ FileWriter* new_filewriter_WA(const char* filename, bool append) {
         return NULL;
     }
     filewriter->file = file;
-    filewriter->write_line = __filewriter_write_line;
-    filewriter->write_string = __filewriter_write_string;
-    filewriter->write_char = __filewriter_write_char;
-    filewriter->write_int = __filewriter_write_int;
-    filewriter->write_long = __filewriter_write_long;
-    filewriter->write_float = __filewriter_write_float;
-    filewriter->write_double = __filewriter_write_double;
+    // filewriter->writeLine = FileWriter_writeLine;
+    // filewriter->writeString = FileWriter_writeString;
+    // filewriter->writeChar = FileWriter_writeChar;
+    // filewriter->writeInt = FileWriter_writeInt;
+    // filewriter->writeLong = FileWriter_writeLong;
+    // filewriter->writeFloat = FileWriter_writeFloat;
+    // filewriter->writeDouble = FileWriter_writeDouble;
     return filewriter;
 }
-FileWriter* new_filewriter_W(const char* filename) { return new_filewriter_WA(filename, false); }
-FileWriter* new_filewriter_A(const char* filename) { return new_filewriter_WA(filename, true); }
-#define new_filewriter(...) GET_MACRO2(__VA_ARGS__, new_filewriter_WA, new_filewriter_W)(__VA_ARGS__)
+FileWriter* new_FileWriter_W(const char* filename) { return __new_FileWriter_WA(filename, false); }
+FileWriter* new_FileWriter_A(const char* filename) { return __new_FileWriter_WA(filename, true); }
+#define new_FileWriter(...) GET_MACRO2(__VA_ARGS__, __new_FileWriter_WA, new_FileWriter_W)(__VA_ARGS__)
 
-void close_filewriter(FileWriter* filewriter) {
+
+void __close_FileWriter(FileWriter* filewriter, bool flush) {
+    if (flush) FileWriter_writeChar(filewriter, '\n');
     if (filewriter != NULL) {
         if (filewriter->file != NULL)
             fclose(filewriter->file);
         free(filewriter);
     }
 }
-
-void close_filewriter_flush(FileWriter* filewriter) {
-    __filewriter_write_char(filewriter, '\n');
-    close_filewriter(filewriter);
-}
+void close_FileWriter_flush(FileWriter* filewriter)   { __close_FileWriter(filewriter, true); }
+void close_FileWriter_noflush(FileWriter* filewriter) { __close_FileWriter(filewriter, false); }
+#define close_FileWriter(...) GET_MACRO2(__VA_ARGS__, __close_FileWriter, close_FileWriter_flush)(__VA_ARGS__)
 
 
 /* String functions */
