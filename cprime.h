@@ -1,5 +1,15 @@
-#ifndef _MYCLIB_H_
-#define _MYCLIB_H_
+/**
+ * @file cprime.h
+ * 
+ * TBD
+ * 
+ * @author Daniel J. Szelogowski
+ * @date September 2024
+ * @license: TBD
+ * 
+ */
+#ifndef _CPRIME_H_
+#define _CPRIME_H_
 
 #include <stdio.h>
 #include <setjmp.h>
@@ -18,7 +28,7 @@
 #include <iso646.h>
 
 
-/* Macros for simulating function overloading */
+/* Macros for simulating function overloading; based on the max number of parameters */
 #define GET_MACRO2(_1, _2, NAME, ...) NAME
 #define GET_MACRO3(_1, _2, _3, NAME, ...) NAME
 #define GET_MACRO4(_1, _2, _3, _4, NAME, ...) NAME
@@ -73,66 +83,66 @@ static jmp_buf ex_buf__;
 
 /* Exception signals */
 // Throw floating-point exception for sigfpe (floating-point exception signal)
-static void handle_sigfpe(int sig) { if (sig == SIGFPE) throw(FLOATING_POINT_EXCEPTION); }
+static void __handle_sigfpe(int sig) { if (sig == SIGFPE) throw(FLOATING_POINT_EXCEPTION); }
 
 // Throw null pointer exception (segmentation fault)
-static void handle_sigsegv(int sig) { if (sig == SIGSEGV) throw(NULL_POINTER_EXCEPTION); }
+static void __handle_sigsegv(int sig) { if (sig == SIGSEGV) throw(NULL_POINTER_EXCEPTION); }
 
 // Throw memory allocation failure exception for sigabrt (abort signal)
-static void handle_sigabrt(int sig) { if (sig == SIGABRT) throw(MEMORY_ALLOCATION_EXCEPTION); }
+static void __handle_sigabrt(int sig) { if (sig == SIGABRT) throw(MEMORY_ALLOCATION_EXCEPTION); }
 
 // Throw illegal argument exception for sigill (illegal instruction signal)
-static void handle_sigill(int sig) { if (sig == SIGILL) throw(ILLEGAL_ARGUMENT_EXCEPTION); }
+static void __handle_sigill(int sig) { if (sig == SIGILL) throw(ILLEGAL_ARGUMENT_EXCEPTION); }
 
 // Throw timeout exception for sigterm (termination signal)
-static void handle_sigterm(int sig) { if (sig == SIGTERM) throw(TIMEOUT_EXCEPTION); }
+static void __handle_sigterm(int sig) { if (sig == SIGTERM) throw(TIMEOUT_EXCEPTION); }
 
 // Throw timeout exception for sigint (interrupt signal)
-static void handle_sigint(int sig) { if (sig == SIGINT) throw(TIMEOUT_EXCEPTION); }
+static void __handle_sigint(int sig) { if (sig == SIGINT) throw(TIMEOUT_EXCEPTION); }
 
 #ifdef __unix__  // Or __APPLE__ for macOS, __linux__ for Linux
     #ifdef SIGBUS
         // Throw hangup exception for sighup (hangup signal)
-        static void handle_sigbus(int sig) { if (sig == SIGBUS) throw(BUS_ERROR_EXCEPTION); }
+        static void __handle_sigbus(int sig) { if (sig == SIGBUS) throw(BUS_ERROR_EXCEPTION); }
     #endif 
 
     #ifdef SIGPIPE
         // Throw pipe error exception for sigpipe (broken pipe signal)
-        static void handle_sigpipe(int sig) { if (sig == SIGPIPE) throw(PIPE_ERROR_EXCEPTION); }
+        static void __handle_sigpipe(int sig) { if (sig == SIGPIPE) throw(PIPE_ERROR_EXCEPTION); }
     #endif
 
     #ifdef SIGHUP
         // Throw hangup exception for sighup (hangup signal)
-        static void handle_sighup(int sig) { if (sig == SIGHUP) throw(HANGUP_EXCEPTION); }
+        static void __handle_sighup(int sig) { if (sig == SIGHUP) throw(HANGUP_EXCEPTION); }
     #endif
 
     #ifdef SIGQUIT
         // Throw quit exception for sigquit (quit signal)
-        static void handle_sigquit(int sig) { if (sig == SIGQUIT) throw(QUIT_EXCEPTION); }
+        static void __handle_sigquit(int sig) { if (sig == SIGQUIT) throw(QUIT_EXCEPTION); }
     #endif
 #endif  // __unix__
 
 
 /* Register signal handlers */
-static void setup_signal_handlers(void) {
-    signal(SIGFPE, handle_sigfpe);
-    signal(SIGSEGV, handle_sigsegv);
-    signal(SIGABRT, handle_sigabrt);
-    signal(SIGILL, handle_sigill);
-    signal(SIGTERM, handle_sigterm);
-    signal(SIGINT, handle_sigint);
+static void __setup_signal_handlers(void) {
+    signal(SIGFPE,  __handle_sigfpe);
+    signal(SIGSEGV, __handle_sigsegv);
+    signal(SIGABRT, __handle_sigabrt);
+    signal(SIGILL,  __handle_sigill);
+    signal(SIGTERM, __handle_sigterm);
+    signal(SIGINT,  __handle_sigint);
     #ifdef __unix__
         #ifdef SIGBUS
-            signal(SIGBUS, handle_sigbus);
+            signal(SIGBUS,  __handle_sigbus);
         #endif
         #ifdef SIGPIPE
-            signal(SIGPIPE, handle_sigpipe);
+            signal(SIGPIPE, __handle_sigpipe);
         #endif
         #ifdef SIGHUP
-            signal(SIGHUP, handle_sighup);
+            signal(SIGHUP,  __handle_sighup);
         #endif
         #ifdef SIGQUIT
-            signal(SIGQUIT, handle_sigquit);
+            signal(SIGQUIT, __handle_sigquit);
         #endif
     #endif  // __unix__
 }
@@ -393,7 +403,7 @@ long long get_long_long(const char* format, ...) {
 
 
 /* Free allocated memory from user-input strings */
-static void teardown(void) {
+static void __teardown(void) {
     if (strings != NULL) {
         for (size_t i = 0; i < allocations; i++)
             free(strings[i]);
@@ -425,8 +435,8 @@ static void teardown(void) {
 
 INITIALIZER(setup) {
     setvbuf(stdout, NULL, _IONBF, 0);
-    setup_signal_handlers();
-    atexit(teardown);
+    __setup_signal_handlers();
+    atexit(__teardown);
 }
 
 
@@ -644,6 +654,34 @@ void close_FileReader(FileReader* filereader) {
 
 
 /* File Writer */
+/**
+ * @brief File writer structure; writes to a file using various data types.
+ * 
+ * @note Instantiate using new_FileWriter(filename, appendMode=false)
+ * @note Close using close_FileWriter(filewriter, flush=true) where `flush` is a line break
+ * 
+ * @param file The file to write to
+ * 
+ * @throw FILE_NOT_FOUND_EXCEPTION if the file is not found
+ * @throw MEMORY_ALLOCATION_EXCEPTION if memory allocation fails
+ * @throw ILLEGAL_ARGUMENT_EXCEPTION if the filename is NULL
+ * 
+ * ### Methods
+ * 
+ * - writeLine(FileWriter*, const char*)
+ * 
+ * - writeString(FileWriter*, const char*)
+ * 
+ * - writeChar(FileWriter*, char)
+ * 
+ * - writeInt(FileWriter*, int)
+ * 
+ * - writeLong(FileWriter*, long)
+ * 
+ * - writeFloat(FileWriter*, float)
+ * 
+ * - writeDouble(FileWriter*, double)
+ */
 typedef struct FileWriter FileWriter;
 struct FileWriter {
     FILE* file;
@@ -656,6 +694,16 @@ struct FileWriter {
     // void (*writeDouble)(FileWriter*, double);
 };
 
+/**
+ * @brief Write a line to the file
+ * 
+ * @param filewriter The file writer to write to
+ * @param line The line to write (with a line break)
+ * 
+ * @throw ILLEGAL_ARGUMENT_EXCEPTION if the file writer or line is NULL
+ * 
+ * @memberof FileWriter
+ */
 void FileWriter_writeLine(FileWriter* filewriter, const char* line) {
     if (filewriter == NULL || filewriter->file == NULL || line == NULL) return;
     fprintf(filewriter->file, "%s\n", line);
@@ -721,7 +769,6 @@ FileWriter* new_FileWriter_W(const char* filename) { return __new_FileWriter_WA(
 FileWriter* new_FileWriter_A(const char* filename) { return __new_FileWriter_WA(filename, true); }
 #define new_FileWriter(...) GET_MACRO2(__VA_ARGS__, __new_FileWriter_WA, new_FileWriter_W)(__VA_ARGS__)
 
-
 void __close_FileWriter(FileWriter* filewriter, bool flush) {
     if (flush) FileWriter_writeChar(filewriter, '\n');
     if (filewriter != NULL) {
@@ -736,6 +783,16 @@ void close_FileWriter_noflush(FileWriter* filewriter) { __close_FileWriter(filew
 
 
 /* String functions */
+/**
+ * @brief Get a substring of a string from the starting index to the ending index
+ * 
+ * @param str The string to get the substring from
+ * @param start The starting index of the substring
+ * @param end The ending index of the substring
+ * 
+ * @return The substring of the string
+ * @throw OUT_OF_BOUNDS_EXCEPTION if the starting index is out of bounds
+ */
 string substr_end(string str, int start, int end) {
     if (str == NULL) return NULL;
     int len = strlen(str);
@@ -748,14 +805,40 @@ string substr_end(string str, int start, int end) {
     return sub;
 }
 
+/**
+ * @brief Get a substring of a string from the starting index to the end of the string
+ * 
+ * @param str The string to get the substring from
+ * @param start The starting index of the substring
+ * 
+ * @return The substring of the string
+ * @throw OUT_OF_BOUNDS_EXCEPTION if the starting index is out of bounds
+ */
 string substr_len(string str, int start) {
     if (str == NULL) return NULL;
     int len = strlen(str);
     return substr_end(str, start, len);
 }
 
+/**
+ * @brief Get a substring of a string
+ * 
+ * @param str The string to get the substring from
+ * @param start The starting index of the substring
+ * @param end The ending index of the substring (optional; default is end of string)
+ * 
+ * @return The substring of the string
+ */
 #define substr(...) GET_MACRO3(__VA_ARGS__, substr_end, substr_len)(__VA_ARGS__)
 
+/**
+ * @brief Find the index of a substring in a string
+ * 
+ * @param str The string to search
+ * @param substr The substring to find
+ * 
+ * @return The index of the substring in the string, or -1 if not found
+ */
 int strindex(string str, string substr) {
     if (str == NULL || substr == NULL) return -1;
     string found = strstr(str, substr);
@@ -763,6 +846,14 @@ int strindex(string str, string substr) {
     return found - str;
 }
 
+/**
+ * @brief Find the index of a character in a string
+ * 
+ * @param str The string to search
+ * @param c The character to find
+ * 
+ * @return The index of the character in the string, or -1 if not found
+ */
 int strindex_char(string str, char c) {
     if (str == NULL) return -1;
     string found = strchr(str, c);
@@ -770,6 +861,13 @@ int strindex_char(string str, char c) {
     return found - str;
 }
 
+/**
+ * @brief Convert a string to uppercase
+ * 
+ * @param str The string to convert to uppercase
+ * 
+ * @return The uppercase string
+ */
 string strtoupper(string str) {
     if (str == NULL) return NULL;
     int len = strlen(str);
@@ -781,6 +879,13 @@ string strtoupper(string str) {
     return upper;
 }
 
+/**
+ * @brief Convert a string to lowercase
+ * 
+ * @param str The string to convert to lowercase
+ * 
+ * @return The lowercase string
+ */
 string strtolower(string str) {
     if (str == NULL) return NULL;
     int len = strlen(str);
@@ -799,6 +904,12 @@ string strtolower(string str) {
     for (type* var = (arr); var < (arr) + arrlen(arr); ++var)
 #define __foreach_4(type, var, arr, len) \
     for (type* var = (arr); var < (arr) + (len); ++var)
+
+/**
+ * @brief Foreach loop macro with implicit or explicit length
+ * 
+ * @param ... Arguments for the foreach loop (type, variable, array, length [optional; required for manually allocated arrays])
+ */
 #define foreach(...) GET_MACRO4(__VA_ARGS__, __foreach_4, __foreach_3)(__VA_ARGS__)
 
 #define __fori_2(var, stop) \
@@ -807,9 +918,19 @@ string strtolower(string str) {
     for (int var = (start); var < (stop); ++var)
 #define __fori_4(var, start, stop, step) \
     for (int var = (start); ((step) > 0) ? (var < (stop)) : (var > (stop)); var += (step))
+
+/**
+ * @brief For loop macro with implicit or explicit start, stop, and step
+ * 
+ * @param ... Arguments for the for loop (loop variable, start=0, stop, step=1)
+ *
+ * @code 
+ * fori (i, 0, 10, 2) { printf("%d ", i); }  // 0 2 4 6 8
+ * @endcode
+ */
 #define fori(...) GET_MACRO4(__VA_ARGS__, __fori_4, __fori_3, __fori_2)(__VA_ARGS__)
 
 
 #pragma GCC diagnostic pop
 
-#endif  // _MYCLIB_H_
+#endif  // _CPRIME_H_

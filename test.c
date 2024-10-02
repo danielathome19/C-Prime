@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "myclib.h"
+#include "cprime.h"
 
 int main() {
     printf("========== Start ==========\n");
