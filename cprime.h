@@ -40,6 +40,8 @@
 #include <iso646.h>
 
 
+
+
 /* Macros for simulating function overloading; based on the max number of parameters */
 #define GET_MACRO2(_1, _2, NAME, ...) NAME
 #define GET_MACRO3(_1, _2, _3, NAME, ...) NAME
@@ -183,6 +185,8 @@ typedef void* any;
 
 
 /* Input functions */
+// TODO: clean up this section
+
 int get_int(const char* format, ...) __attribute__((format(printf, 1, 2)));
 float get_float(const char* format, ...) __attribute__((format(printf, 1, 2)));
 double get_double(const char* format, ...) __attribute__((format(printf, 1, 2)));
