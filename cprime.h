@@ -18,7 +18,7 @@
  * 
  * @author Daniel J. Szelogowski
  * @date September 2024
- * @license: TBD
+ * @license: MIT
  */
 #ifndef _CPRIME_H_
 #define _CPRIME_H_
