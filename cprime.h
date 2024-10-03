@@ -4,17 +4,17 @@
  * C′ (C Prime) is a library for the C programming language that includes 
  * standard library headers, macros, and functions to provide a more modern and 
  * user-friendly experience for C programmers. It includes high-level (C++-like) features:
- *  - exception/signal handling, try-catch-finally blocks
- *  - function overloading (using macros)
- *  - boolean, string, and auto types
- *  - simplified input functions (with prompts)
- *  - string functions (substring, index, toupper/tolower, etc.)
- *  - foreach, fori, and arrlen macros
+ *  - Exception/signal handling, try-catch-finally blocks
+ *  - Function overloading (using macros)
+ *  - Boolean, string, and auto types
+ *  - Simplified input functions (with prompts)
+ *  - String functions (substring, index, toupper/tolower, etc.)
+ *  - Foreach, fori, and arrlen macros
  *  - File Reader and File Writer classes
- *  - etc.
+ *  - Etc.
  * 
- * This header file is intended to be a drop-in replacement for the standard C library
- * and is designed to be used in conjunction with the standard C library headers.
+ * This header file is intended to be a drop-in replacement for much of the C standard library 
+ * and is designed to be used alongside the standard C library headers.
  * 
  * @author Daniel J. Szelogowski
  * @date September 2024
