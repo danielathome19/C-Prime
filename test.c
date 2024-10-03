@@ -116,6 +116,9 @@ int main() {
     float f = get_float("Enter a float: ");
     printf("Integer: %d, Float: %f\n", n, f);
 
+    var n2 = input(int, "Enter an int: ");
+    printf("Integer 2: %d\n", n2);
+
     // Test verbal logical operators (from iso646.h)
     bool testbool = 1 and 3;
     while (testbool or false) {

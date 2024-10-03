@@ -185,17 +185,6 @@ typedef void* any;
 
 
 /* Input functions */
-// TODO: clean up this section
-
-int get_int(const char* format, ...) __attribute__((format(printf, 1, 2)));
-float get_float(const char* format, ...) __attribute__((format(printf, 1, 2)));
-double get_double(const char* format, ...) __attribute__((format(printf, 1, 2)));
-long get_long(const char* format, ...) __attribute__((format(printf, 1, 2)));
-long long get_long_long(const char* format, ...) __attribute__((format(printf, 1, 2)));
-char get_char(const char* format, ...) __attribute__((format(printf, 1, 2)));
-string get_string(va_list* args, const char* format, ...) __attribute__((format(printf, 2, 3)));
-#define get_string(...) get_string(NULL, __VA_ARGS__)
-
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wformat-security"
 
@@ -414,14 +403,17 @@ long long get_long_long(const char* format, ...) {
 
 /* Macro to abstract get_X as `input(int, "Enter an int: ")` */
 #define input(type, prompt) \
-    _Generic((type), \
+    _Generic((type)0, \
         int: get_int, \
         float: get_float, \
         double: get_double, \
         long: get_long, \
         long long: get_long_long, \
         char: get_char, \
-        string: get_string)(prompt)
+        string: get_string \
+    )(prompt)
+
+
 
 
 /* Free allocated memory from user-input strings */
@@ -1061,6 +1053,8 @@ string strtolower(string str) {
  * @endcode
  */
 #define fori(...) GET_MACRO4(__VA_ARGS__, __fori_4, __fori_3, __fori_2)(__VA_ARGS__)
+
+
 
 
 #pragma GCC diagnostic pop
