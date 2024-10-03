@@ -412,6 +412,17 @@ long long get_long_long(const char* format, ...) {
     }
 }
 
+/* Macro to abstract get_X as `input(int, "Enter an int: ")` */
+#define input(type, prompt) \
+    _Generic((type), \
+        int: get_int, \
+        float: get_float, \
+        double: get_double, \
+        long: get_long, \
+        long long: get_long_long, \
+        char: get_char, \
+        string: get_string)(prompt)
+
 
 /* Free allocated memory from user-input strings */
 static void __teardown(void) {
