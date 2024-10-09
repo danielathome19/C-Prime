@@ -157,7 +157,7 @@ int main() {
     {
     autofree string str2 = (string)malloc(10);
     strcpy(str2, "Hello");
-    printf("%s\n", str2);
+    printfn("%s", str2);
     }
 
     printf("========== Done ==========\n");
