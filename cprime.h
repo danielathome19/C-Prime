@@ -172,6 +172,13 @@ static void __setup_signal_handlers(void) {
 #endif
 
 
+/* Attribute definitions */
+
+void autofree_impl(void *p) { free(*((void **)p)); }
+/* Automatically frees a value at the end of scope */
+#define autofree __attribute__((__cleanup__(autofree_impl)))
+
+
 
 
 /* Type definitions */
@@ -918,6 +925,7 @@ void __close_FileWriter_noflush(FileWriter* filewriter) { __close_FileWriter(fil
 
 
 /* String functions */
+#define printfn(...) printf(__VA_ARGS__), putchar('\n')
 
 /**
  * @brief Get a substring of a string from the starting index to the ending index

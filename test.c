@@ -148,10 +148,17 @@ int main() {
     fori (i, 1, 5) {
         printf("%d ", i);
     }
-    printf("\n");
+    printfn("");
 
     fori (i, 10) printf("%d ", i);
-    printf("\n");
+    printfn("");
+
+    // Test autofree attribute (freed at the end of scope)
+    {
+    autofree string str2 = (string)malloc(10);
+    strcpy(str2, "Hello");
+    printf("%s\n", str2);
+    }
 
     printf("========== Done ==========\n");
     return 0;
