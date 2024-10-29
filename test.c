@@ -160,6 +160,29 @@ int main() {
     printfn("%s", str2);
     }
 
+    // Test until, unless, and repeat
+    int i = 0;
+    until (i == 5) {
+        printf("%d ", i);
+        i++;
+    }
+
+    do {
+        printf("%d ", i);
+        i++;
+    } until (i == 10);
+
+    unless (i == 10) {
+        printf("Not 10\n");
+    } else {
+        printf("10\n");
+    }
+
+    repeat (5) {
+        printf("%d ", _i);
+    }
+    printfn("");
+
     printf("========== Done ==========\n");
     return 0;
 }

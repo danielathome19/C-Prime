@@ -1030,7 +1030,7 @@ string strtolower(string str) {
 
 
 
-/* For macros */
+/* Decision structure macros */
 
 /* @return The number of items in an array (does not work for array pointers) */
 #define arrlen(array) (sizeof(array) / sizeof(array[0]))
@@ -1062,6 +1062,82 @@ string strtolower(string str) {
  */
 #define fori(...) GET_MACRO4(__VA_ARGS__, __fori_4, __fori_3, __fori_2)(__VA_ARGS__)
 
+/**
+ * @brief Until loop macro with a condition (equivalent to `while (!cond)`)
+ * @param cond The condition to check
+ * 
+ * @code
+ * do { ... } until (cond);
+ * @endcode
+ * @code
+ * until (cond) { ... }
+ * @endcode
+ */
+#define until(cond) while(!(cond))
+
+
+/**
+ * @brief Unless clause macro (equivalent to `if (!cond)`)
+ * @param cond The condition to check
+ * 
+ * @code
+ * unless (cond) { ... }
+ * @endcode
+ */
+#define unless(cond) if(!(cond))
+
+
+/**
+ * @brief Repeat loop macro with a count (equivalent to `for (int _i = 0; _i < count; ++_i)`)
+ * @param count The number of times to repeat
+ * 
+ * @code
+ * repeat (5) { printf("%d ", _i); }  // 0 1 2 3 4
+ * @endcode
+ */
+#define repeat(count) for (int _i = 0; _i < (count); ++_i)
+
+
+
+
+/* Utility function macros */
+
+/* TODO: documentation and tests */
+#define swap(x, y) do { typeof(x) temp = (x); (x) = (y); (y) = temp; } while(0)
+
+#define concat(x, y) x ## y
+#define temp_var(n) concat(temp_var_, n)
+
+#define min(a, b) ((a) < (b) ? (a) : (b))
+#define max(a, b) ((a) > (b) ? (a) : (b))
+
+#define is_null(ptr) ((ptr) == NULL)
+#define not_null(ptr) ((ptr) != NULL)
+
+#define tostring(x) #x
+#define tostr(x) tostring(x)
+
+#define defer(func) __attribute__((__cleanup__(func)))
+
+#define and_not(a, b) ((a) & ~(b))
+#define set_bit(var, pos) ((var) |= (1U << (pos)))
+#define clear_bit(var, pos) ((var) &= ~(1U << (pos)))
+#define toggle_bit(var, pos) ((var) ^= (1U << (pos)))
+#define check_bit(var, pos) (((var) & (1U << (pos))) ? 1 : 0)
+
+#define array_init(arr, value) for (size_t i = 0; i < arrlen(arr); ++i) arr[i] = (value)
+
+#define enum_to_str(name, ...) \
+    typedef enum { __VA_ARGS__ } name##_t; \
+    const char* name##_str[] = { #__VA_ARGS__ }
+
+#define enum_get_name(name, val) name##_str[val]
+
+#define DEFINE_GETTER(type, field) \
+    type get_##field(type##_t* obj) { return obj->field; }
+
+#define DEFINE_SETTER(type, field) \
+    void set_##field(type##_t* obj, type val) { obj->field = val; }
 
 
 
