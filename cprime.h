@@ -1141,6 +1141,48 @@ string strtolower(string str) {
 
 
 
+
+/* Class definition macros */
+
+/* Define a class structure */
+#define CLASS(name, fields) \
+    typedef struct name name; \
+    struct name fields; \
+    name* new_##name() { \
+        name* instance = (name*) malloc(sizeof(name)); \
+        if (!instance) { \
+            perror("Memory allocation failed"); \
+            exit(EXIT_FAILURE); \
+        } \
+        memset(instance, 0, sizeof(name)); \
+        return instance; \
+    } \
+    void delete_##name(name* instance) { \
+        if (instance) free(instance); \
+    }
+
+/* Define a method for the class */
+#define METHOD(return_type, class_name, method_name) \
+    return_type class_name##_##method_name(class_name* this)
+
+/* Define a getter */
+#define GETTER(class_name, field_type, field_name) \
+    field_type class_name##_get_##field_name(class_name* this) { \
+        return this->field_name; \
+    }
+
+/* Define a setter */
+#define SETTER(class_name, field_type, field_name) \
+    void class_name##_set_##field_name(class_name* this, field_type value) { \
+        this->field_name = value; \
+    }
+
+/* Define fields (helper to enable CLASS macro formatting) */
+#define FIELDS(...) { __VA_ARGS__ }
+
+
+
+
 #pragma GCC diagnostic pop
 
 #endif  // _CPRIME_H_

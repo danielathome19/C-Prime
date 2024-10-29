@@ -1,6 +1,29 @@
 #include <stdio.h>
 #include "cprime.h"
 
+CLASS(Person,
+    FIELDS(
+        int age;
+        char* name;
+    )
+)
+
+METHOD(void, Person, sayHi) {
+    printf("Hi\n");
+}
+
+METHOD(void, Person, doBirthday) {
+    this->age += 1;
+    printf("Happy birthday %s! You are now %d years old.\n", this->name, this->age);
+}
+
+GETTER(Person, int, age)
+GETTER(Person, char*, name)
+
+SETTER(Person, int, age)
+SETTER(Person, char*, name)
+
+
 int main() {
     printf("========== Start ==========\n");
     
@@ -182,6 +205,18 @@ int main() {
         printf("%d ", _i);
     }
     printfn("");
+
+
+    Person* p = new_Person();
+    Person_set_name(p, "Alice");
+    Person_set_age(p, 29);
+    
+    printf("%s is %d years old.\n", Person_get_name(p), Person_get_age(p));
+    
+    Person_sayHi(p);
+    Person_doBirthday(p);
+    
+    delete_Person(p);
 
     printf("========== Done ==========\n");
     return 0;
