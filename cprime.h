@@ -1133,12 +1133,6 @@ string strtolower(string str) {
 
 #define enum_get_name(name, val) name##_str[val]
 
-#define DEFINE_GETTER(type, field) \
-    type get_##field(type##_t* obj) { return obj->field; }
-
-#define DEFINE_SETTER(type, field) \
-    void set_##field(type##_t* obj, type val) { obj->field = val; }
-
 
 
 
