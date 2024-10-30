@@ -21,7 +21,6 @@ GETTER(Person, int, age)
 GETTER(Person, char*, name)
 
 SETTER(Person, int, age)
-SETTER(Person, char*, name)
 
 
 int main() {
